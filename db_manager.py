@@ -63,3 +63,36 @@ def addflag(target_id, flag_text):
     with open(filename, "w") as file:
         json.dump(users_list, file, indent=4)
     return f"Added flag{flag_text}" 
+
+def get_user_flags(target_id):
+    try: 
+        with open(filename, "r") as file:
+            users_list = json.load(file)
+    except FileNotFoundError:
+        return "Save a user first"
+    for user in users_list:
+        if user["id"] == target_id:
+            return user.get("flags", [])
+    return f"User ID '{target_id}' not found."
+
+def remove_flag(target_id, flag_text):
+    try: 
+        with open(filename, "r") as file:
+            users_list = json.load(file)
+    except FileNotFoundError:
+        return "Save a user first"
+    found = False
+
+    for user in users_list:
+        if user["id"] == target_id:
+            found = True
+            if "flags" in user and flag_text in user["flags"]:
+                user["flags"].remove(flag_text)
+                break
+            else:
+                return f"Flag '{flag_text}' not found for User ID '{target_id}'."
+    if not found:
+        return f"User ID '{target_id}' not found."
+    with open(filename, "w") as file:
+        json.dump(users_list, file, indent=4)
+    return f"Removed flag '{flag_text}' from User ID '{target_id}'"
